@@ -15,8 +15,12 @@ const log = debug('app');
 
 debug.enable('app');
 
-mongoose.connect(process.env['MONGODB_URL'] as string).then(() => {
-  server.listen(PORT, () => {
-    log(`Server listening at http://localhost:${PORT}`);
+mongoose
+  .connect(process.env['MONGODB_URL'] as string, {
+    dbName: 'incrementalProject',
+  })
+  .then(() => {
+    server.listen(PORT, () => {
+      log(`Server listening at http://localhost:${PORT}`);
+    });
   });
-});

@@ -1,12 +1,18 @@
 import { Router } from 'express';
 import { catchAsync } from '../utils/catchAsync';
+import { UserController } from './users.controller';
 import { User } from './users.model';
 
 export const userRouter = Router();
+const userController = new UserController(User);
 
-userRouter.route('/').get(
-  catchAsync(async (_req, res) => {
-    const users = await User.find();
-    res.json({ users });
-  }),
-);
+/**
+ * @openapi
+ * /users:
+ *   get:
+ *     description: Endpoint to retrieve users
+ *     responses:
+ *       200:
+ *         description: Returns the list of users.
+ */
+userRouter.route('/').get(catchAsync(userController.listUsers));
