@@ -1,26 +1,24 @@
-import http from 'http';
-import debug from 'debug';
-import config from 'config';
 import dotenv from 'dotenv';
-import mongoose from 'mongoose';
 
 dotenv.config();
 
-import { app } from './app';
+import http from 'http';
+import mongoose from 'mongoose';
+import config from 'config';
 
+import { initApp } from './app';
+import { initLogger } from './libs/logger';
+
+const logger = initLogger();
+const { app, port } = initApp(logger);
 const server = http.createServer(app);
-const serverPort = config.get<number>('port');
-const PORT = serverPort;
-const log = debug('app');
-
-debug.enable('app');
 
 mongoose
-  .connect(process.env['MONGODB_URL'] as string, {
+  .connect(config.get('db.url'), {
     dbName: 'incrementalProject',
   })
   .then(() => {
-    server.listen(PORT, () => {
-      log(`Server listening at http://localhost:${PORT}`);
+    server.listen(port, () => {
+      logger.info(`Server listening at http://localhost:${port}`);
     });
   });

@@ -4,7 +4,7 @@ import config from 'config';
 import type { ErrorRequestHandler, Response } from 'express';
 import { AppError } from '../utils/AppError';
 
-const sendErrorDev = (err: any, res: Response) => {
+const sendErrorDev = (err: AppError, res: Response) => {
   res.status(err.statusCode).json({
     message: err.message,
     stack: err.stack,
@@ -22,8 +22,8 @@ const sendErrorProd = (err: AppError, res: Response) => {
     // don't leak the error to the client
     console.error('ERROR 🚨', err);
     res.status(500).json({
-      status: 'error',
-      message: 'Something went wrong',
+      statusCode: 500,
+      message: STATUS_CODES[500],
     });
   }
 };
@@ -32,7 +32,7 @@ const sendErrorProd = (err: AppError, res: Response) => {
 export const globalErrorHandler: ErrorRequestHandler = (err, _, res, _next) => {
   err.statusCode = err.statusCode || 500;
 
-  if (config.get<boolean>('DEBUG')) {
+  if (config.get('DEBUG')) {
     sendErrorDev(err, res);
   } else {
     const error = { ...err };
