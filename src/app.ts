@@ -9,6 +9,7 @@ import { globalErrorHandler } from './middlewares/globalErrorHandler';
 import { userRouter } from './users/users.routes';
 import { AppError } from './utils/AppError';
 import { Logger } from 'winston';
+import { authRouter } from './auth/auth.routes';
 
 export const initApp = (logger: Logger) => {
   const app = express();
@@ -28,7 +29,15 @@ export const initApp = (logger: Logger) => {
       swaggerUi.setup(swaggerJSDoc(config.get('swagger'))),
     )
     .use(auth(config.get('auth0')))
+    .use('/api/v1/auth', authRouter)
     .use('/api/v1/users', userRouter)
+    .get('/profile', (req, res) => {
+      res.send({
+        user: req.oidc.user,
+        access_token: req.oidc.accessToken?.access_token,
+        id_token: req.oidc.idToken,
+      });
+    })
     .all('*', (_req, _res, next) => {
       next(new AppError('Not Found', 404));
     })

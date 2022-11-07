@@ -1,5 +1,6 @@
 import { STATUS_CODES } from 'http';
 import config from 'config';
+import Joi from 'joi';
 
 import type { ErrorRequestHandler, Response } from 'express';
 import { AppError } from '../utils/AppError';
@@ -28,6 +29,9 @@ const sendErrorProd = (err: AppError, res: Response) => {
   }
 };
 
+const handleAuth0TokenError = () => new AppError('Unauthorized', 401);
+const handleJoiError = () => new AppError('Bad Request', 400);
+
 // don't remove _next in parameters otherwise the middleware won't work
 export const globalErrorHandler: ErrorRequestHandler = (err, _, res, _next) => {
   err.statusCode = err.statusCode || 500;
@@ -35,7 +39,15 @@ export const globalErrorHandler: ErrorRequestHandler = (err, _, res, _next) => {
   if (config.get('DEBUG')) {
     sendErrorDev(err, res);
   } else {
-    const error = { ...err };
+    let error = { ...err };
+
+    if (err.name === 'UnauthorizedError') {
+      error = handleAuth0TokenError();
+    }
+
+    if (Joi.isError(err)) {
+      error = handleJoiError();
+    }
 
     sendErrorProd(error, res);
   }

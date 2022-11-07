@@ -15,7 +15,7 @@ module.exports = {
         version: '1.0.0',
       },
     },
-    apis: [__dirname + '/**/*.routes.ts'],
+    apis: ['./src/**/*.routes.ts'],
   },
   auth0: {
     clientID: process.env.AUTH0_CLIENT_ID,
@@ -23,12 +23,12 @@ module.exports = {
     clientSecret: process.env.AUTH0_CLIENT_SECRET,
     authRequired: false,
     auth0Logout: true,
-    issuerBaseURL: 'https://dev-mpaylzhdhvqrio10.us.auth0.com',
+    issuerBaseURL: `https://${process.env.AUTH0_DOMAIN}`,
     baseURL: 'http://localhost:5555',
     authorizationParams: {
-      scope: 'openid profile',
-      responseType: 'code',
-      audience: 'https://ym-toptal.api',
+      response_type: 'code id_token',
+      audience: process.env.AUTH0_AUDIENCE,
+      scope: 'openid profile email',
     },
   },
 };
