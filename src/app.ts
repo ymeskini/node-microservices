@@ -10,6 +10,7 @@ import { userRouter } from './users/users.routes';
 import { AppError } from './utils/AppError';
 import { Logger } from 'winston';
 import { authRouter } from './auth/auth.routes';
+import { jwtCheck } from './auth/auth.middleware';
 
 export const initApp = (logger: Logger) => {
   const app = express();
@@ -31,8 +32,8 @@ export const initApp = (logger: Logger) => {
     .use(auth(config.get('auth0')))
     .use('/api/v1/auth', authRouter)
     .use('/api/v1/users', userRouter)
-    .get('/profile', (req, res) => {
-      res.send({
+    .get('/profile', jwtCheck, (req, res) => {
+      res.json({
         user: req.oidc.user,
         access_token: req.oidc.accessToken?.access_token,
         id_token: req.oidc.idToken,
