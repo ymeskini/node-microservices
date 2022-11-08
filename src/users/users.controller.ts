@@ -12,4 +12,13 @@ export class UserController {
     const users = await this.userModel.find();
     res.json({ users });
   };
+
+  profile = async (req: Request, res: Response) => {
+    const { oidc } = req;
+
+    res.json({
+      user: oidc.user,
+      token: oidc.accessToken?.access_token,
+    });
+  };
 }

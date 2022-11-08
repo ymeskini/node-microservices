@@ -1,88 +1,79 @@
 import mongoose from 'mongoose';
 
-interface IUser {
+interface IAddress {
+  address: string;
+  city: string;
+  postalCode: string;
+  state: string;
+  primary: boolean;
+  label: string;
+}
+
+export interface IUser {
   createdAt: Date;
   modifiedAt: Date;
   email: string;
-  permissionLevel: 'Admin' | 'User';
-  firstName: string;
-  lastName: string;
-  gender: 'male' | 'female';
-  phone: string;
-  username: string;
-  password: string;
-  birthDate: Date;
-  avatar: string;
+  auth0Id: string;
+  permissionLevel: 'admin' | 'user';
   status: 'active' | 'closed';
-  addresses: {
-    address: string;
-    city: string;
-    postalCode: string;
-    state: string;
-    primary: boolean;
-    label: string;
-  }[];
+
+  // optional fields
+  firstName?: string;
+  lastName?: string;
+  gender?: string;
+  phone?: string;
+  birthDate?: Date;
+  avatar?: string;
+  addresses?: IAddress[];
 }
 
 const userSchema = new mongoose.Schema<IUser>({
   createdAt: {
     type: Date,
     required: true,
+    default: new Date(),
   },
   modifiedAt: {
     type: Date,
     required: true,
+    default: new Date(),
   },
   email: {
     type: String,
     required: true,
   },
+  auth0Id: {
+    type: String,
+    required: true,
+  },
   permissionLevel: {
     type: String,
-    enum: ['Admin', 'User'],
-    default: 'User',
-    required: true,
-  },
-  firstName: {
-    type: String,
-    required: true,
-  },
-  lastName: {
-    type: String,
-    required: true,
-  },
-  gender: {
-    type: String,
-    enum: ['male', 'female'],
-    required: true,
-  },
-  phone: {
-    type: String,
-    required: true,
-  },
-  username: {
-    type: String,
-    required: true,
-    min: 6,
-  },
-  password: {
-    type: String,
-    required: true,
-    min: 8,
-  },
-  birthDate: {
-    type: Date,
-    required: true,
-  },
-  avatar: {
-    type: String,
+    enum: ['admin', 'user'],
+    default: 'user',
     required: true,
   },
   status: {
     type: String,
     enum: ['active', 'closed'],
     default: 'active',
-    required: true,
+  },
+  firstName: {
+    type: String,
+  },
+  lastName: {
+    type: String,
+  },
+  gender: {
+    type: String,
+  },
+  phone: {
+    type: String,
+  },
+  birthDate: {
+    type: Date,
+  },
+  avatar: {
+    type: String,
   },
   addresses: [
     {
