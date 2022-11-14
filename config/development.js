@@ -1,15 +1,21 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const defer = require('config/defer').deferConfig;
+
 module.exports = {
   DEBUG: true,
   server: {
     port: 5555,
     host: 'localhost',
+    url: 'http://localhost:5555',
   },
   db: {
     url: process.env.MONGODB_URL,
   },
   swagger: {
     definition: {
-      basePath: '/api/v1',
+      basePath: defer(function () {
+        return this.server.url + '/api/v1';
+      }),
       info: {
         title: 'Users API',
         version: '1.0.0',
@@ -26,9 +32,9 @@ module.exports = {
     issuerBaseURL: `https://${process.env.AUTH0_DOMAIN}`,
     baseURL: 'http://localhost:5555',
     authorizationParams: {
-      response_type: 'code id_token',
+      response_type: 'code',
+      scope: 'openid profile read:users',
       audience: process.env.AUTH0_AUDIENCE,
-      scope: 'openid profile email',
     },
   },
 };

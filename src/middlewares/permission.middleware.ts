@@ -6,8 +6,8 @@ type UserPermission =
   | 'delete:users'
   | 'read:users';
 
-export const checkPermissions = (permissions: UserPermission) =>
-  jwtAuthz([permissions], {
+export const checkPermissions = (permissions: UserPermission[]) =>
+  jwtAuthz(permissions, {
     customScopeKey: 'permissions',
     customUserKey: 'auth',
     checkAllScopes: true,

@@ -1,20 +1,21 @@
 import express, { Router } from 'express';
 import morgan from 'morgan';
-import { auth } from 'express-openid-connect';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import config from 'config';
+import { Logger } from 'winston';
 
 import { globalErrorHandler } from './middlewares/error.middleware';
 import { userRouter } from './users/users.routes';
 import { AppError } from './utils/AppError';
-import { Logger } from 'winston';
+import { authRouter } from './auth/auth.routes';
+import { oicdMiddleware } from './middlewares/auth.middleware';
 
 export const initApp = (logger: Logger) => {
   const app = express();
   const v1Router = Router();
 
-  v1Router.use('/users', userRouter);
+  v1Router.use('/users', userRouter).use('/auth', authRouter);
 
   app
     .disable('x-powered-by')
@@ -30,12 +31,12 @@ export const initApp = (logger: Logger) => {
       swaggerUi.serve,
       swaggerUi.setup(swaggerJSDoc(config.get('swagger'))),
     )
-    .use(auth(config.get('auth0')))
+    .use(oicdMiddleware)
     .use('/api/v1', v1Router)
     .all('*', (_req, _res, next) => {
       next(new AppError('Not Found', 404));
     })
-    .use(globalErrorHandler);
+    .use(globalErrorHandler(logger));
 
   return { app, port: config.get<number>('server.port') };
 };

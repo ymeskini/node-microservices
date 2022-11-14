@@ -14,7 +14,7 @@ export interface IUser {
   modifiedAt: Date;
   email: string;
   auth0Id: string;
-  permissionLevel: 'admin' | 'user';
+  roles: 'admin' | 'user'[];
   status: 'active' | 'closed';
 
   // optional fields
@@ -46,12 +46,13 @@ const userSchema = new mongoose.Schema<IUser>({
     type: String,
     required: true,
   },
-  permissionLevel: {
-    type: String,
-    enum: ['admin', 'user'],
-    default: 'user',
-    required: true,
-  },
+  roles: [
+    {
+      type: String,
+      enum: ['admin', 'user'],
+      required: true,
+    },
+  ],
   status: {
     type: String,
     enum: ['active', 'closed'],
