@@ -1,3 +1,4 @@
+import axios from 'axios';
 import type { ErrorRequestHandler } from 'express';
 import { STATUS_CODES } from 'http';
 import Joi from 'joi';
@@ -15,7 +16,7 @@ export const globalErrorHandler =
     err.statusCode = err.statusCode || 500;
     let error = { ...err };
 
-    logger.error(err);
+    logger.error(err.message);
 
     if (err.name === 'UnauthorizedError') {
       error = handleAuth0TokenError();
@@ -23,6 +24,18 @@ export const globalErrorHandler =
 
     if (Joi.isError(err)) {
       error = handleJoiError();
+    }
+
+    if (axios.isAxiosError(err)) {
+      logger.error(err.response?.data);
+      error = new AppError(
+        err?.response?.statusText || 'Server Error',
+        err?.response?.status || 500,
+      );
+    }
+
+    if (err.message === 'Insufficient scope') {
+      error = new AppError('Forbidden', 403);
     }
 
     if (error.isOperational) {

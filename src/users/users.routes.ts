@@ -20,7 +20,11 @@ userRouter.use(jwtCheck);
  *       200:
  *         description: Returns user profile.
  */
-userRouter.route('/me').get(catchAsync(userController.profile));
+userRouter
+  .route('/me')
+  .get(catchAsync(userController.profile))
+  .patch(catchAsync(userController.updateProfile))
+  .delete(catchAsync(userController.closeProfile));
 
 /**
  * @openapi
@@ -33,7 +37,7 @@ userRouter.route('/me').get(catchAsync(userController.profile));
  *       401:
  *         description: Token is not correct
  *       403:
- *         description: Insufficient persmissions
+ *         description: Insufficient permissions
  *   post:
  *     description: Endpoint to retrieve users
  *     responses:
@@ -56,6 +60,10 @@ userRouter
     checkPermissions(['create:users']),
     catchAsync(userController.createUser),
   )
+  .get(checkPermissions(['read:users']), catchAsync(userController.listUsers));
+
+userRouter
+  .route('/:id')
   .delete(
     checkPermissions(['delete:users']),
     catchAsync(userController.deleteUser),
@@ -63,5 +71,4 @@ userRouter
   .patch(
     checkPermissions(['update:users']),
     catchAsync(userController.updateUser),
-  )
-  .get(checkPermissions(['read:users']), catchAsync(userController.listUsers));
+  );

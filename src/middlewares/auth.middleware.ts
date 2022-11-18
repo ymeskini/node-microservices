@@ -3,10 +3,6 @@ import { auth } from 'express-openid-connect';
 import jwks from 'jwks-rsa';
 import config from 'config';
 
-import { User } from '../users/users.model';
-
-const PERMISSION_PATH = `${process.env['AUTH0_AUDIENCE']}/roles`;
-
 export const jwtCheck = expressjwt({
   secret: jwks.expressJwtSecret({
     cache: true,
@@ -21,19 +17,4 @@ export const jwtCheck = expressjwt({
 
 export const oicdMiddleware = auth({
   ...config.get('auth0'),
-  afterCallback: async (req, _res, session) => {
-    const { oidc } = req;
-    const user = await oidc.fetchUserInfo();
-    const foundUser = await User.findOne({ auth0Id: user.sub });
-
-    if (!foundUser) {
-      await User.create({
-        auth0Id: user.sub,
-        email: user.email,
-        roles: user[PERMISSION_PATH],
-      });
-    }
-
-    return session;
-  },
 });

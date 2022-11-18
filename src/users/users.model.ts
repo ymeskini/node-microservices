@@ -13,9 +13,13 @@ export interface IUser {
   createdAt: Date;
   modifiedAt: Date;
   email: string;
-  auth0Id: string;
   roles: 'admin' | 'user'[];
   status: 'active' | 'closed';
+
+  // fields from auth0
+  tenant: string; // "ym-toptal"
+  connection: string; // "Username-Password-Authentication"
+  password: string;
 
   // optional fields
   firstName?: string;
@@ -23,7 +27,6 @@ export interface IUser {
   gender?: string;
   phone?: string;
   birthDate?: Date;
-  avatar?: string;
   addresses?: IAddress[];
 }
 
@@ -42,10 +45,6 @@ const userSchema = new mongoose.Schema<IUser>({
     type: String,
     required: true,
   },
-  auth0Id: {
-    type: String,
-    required: true,
-  },
   roles: [
     {
       type: String,
@@ -58,6 +57,8 @@ const userSchema = new mongoose.Schema<IUser>({
     enum: ['active', 'closed'],
     default: 'active',
   },
+
+  // optional fields
   firstName: {
     type: String,
   },
@@ -72,9 +73,6 @@ const userSchema = new mongoose.Schema<IUser>({
   },
   birthDate: {
     type: Date,
-  },
-  avatar: {
-    type: String,
   },
   addresses: [
     {

@@ -1,17 +1,20 @@
 import { Router } from 'express';
-import { IUser } from '../users/users.model';
+import { requiresAuth } from 'express-openid-connect';
+import { jwtCheck } from '../middlewares/auth.middleware';
+import { User } from '../users/users.model';
+import { catchAsync } from '../utils/catchAsync';
+
 import { AuthController } from './auth.controller';
 
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
-  namespace Express {
-    interface Request {
-      loggedUser: IUser;
-    }
-  }
-}
-
 export const authRouter = Router();
-const authController = new AuthController();
+const authController = new AuthController(User);
 
-authRouter.route('/token').get(authController.getToken);
+authRouter.route('/login').get(authController.login);
+authRouter.route('/token').get(requiresAuth(), authController.getToken);
+
+authRouter.use(jwtCheck);
+authRouter.route('/logout').get(authController.logout);
+authRouter
+  .route('/resetPassword')
+  .post(catchAsync(authController.resetPassword));
+authRouter.route('/changeEmail').post(catchAsync(authController.changeMail));

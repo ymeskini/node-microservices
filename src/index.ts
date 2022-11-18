@@ -15,7 +15,7 @@ const server = http.createServer(app);
 
 mongoose
   .connect(config.get('db.url'), {
-    dbName: 'incrementalProject',
+    dbName: 'db-name',
   })
   .then(() => {
     server.listen(port, () => {

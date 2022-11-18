@@ -31,9 +31,13 @@ module.exports = {
     auth0Logout: true,
     issuerBaseURL: `https://${process.env.AUTH0_DOMAIN}`,
     baseURL: 'http://localhost:5555',
+    routes: {
+      login: '/api/v1/auth/login',
+      logout: '/api/v1/auth/logout',
+    },
     authorizationParams: {
       response_type: 'code',
-      scope: 'openid profile read:users',
+      scope: 'openid email read:users create:users update:users delete:users',
       audience: process.env.AUTH0_AUDIENCE,
     },
   },
