@@ -1,11 +1,17 @@
 import axios from 'axios';
+import config from 'config';
+import { auth0RolesIds, UserRole } from '../users/users.model';
+
+const auth0ClientID = config.get<string>('auth0.clientID');
+const auth0ClientSecret = config.get<string>('auth0.clientSecret');
+const auth0ApiBaseUrl = config.get<string>('auth0.issuerBaseURL');
 
 const auth0Client = axios.create({
-  baseURL: 'https://ym-toptal.eu.auth0.com',
+  baseURL: auth0ApiBaseUrl,
 });
 
 const baseData = {
-  client_id: 'KRquB2LduPRtmRSeF9r2r3o97zNGURPC',
+  client_id: auth0ClientID,
   connection: 'Username-Password-Authentication',
 };
 
@@ -19,7 +25,7 @@ export const updateUserEmail = (
 ) =>
   auth0Client.patch(
     `/api/v2/users/${userId}`,
-    { email, ...baseData },
+    { email, verify_email: true, ...baseData },
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -37,6 +43,7 @@ export const createAuth0User = (body: CreateUserBody, accessToken: string) =>
     '/api/v2/users',
     {
       ...body,
+      // sends email verification
       verify_email: true,
       connection: 'Username-Password-Authentication',
     },
@@ -52,13 +59,30 @@ export const getAuth0Token = () =>
     '/oauth/token',
     new URLSearchParams({
       grant_type: 'client_credentials',
-      client_id: process.env['AUTH0_CLIENT_ID'] as string,
-      client_secret: process.env['AUTH0_CLIENT_SECRET'] as string,
-      audience: 'https://ym-toptal.eu.auth0.com/api/v2/',
+      client_id: auth0ClientID,
+      client_secret: auth0ClientSecret,
+      audience: `${auth0ApiBaseUrl}/api/v2/`,
     }),
     {
       headers: {
         'content-type': 'application/x-www-form-urlencoded',
+      },
+    },
+  );
+
+export const assignRoleToUser = (
+  id: string,
+  roles: UserRole[],
+  accessToken: string,
+) =>
+  auth0Client.post(
+    `/api/v2/users/${id}/roles`,
+    {
+      roles: roles.map((role) => auth0RolesIds[role]),
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
       },
     },
   );

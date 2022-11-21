@@ -9,11 +9,19 @@ interface IAddress {
   label: string;
 }
 
+export type UserRole = 'admin' | 'customer' | 'supplier';
+
+export const auth0RolesIds = {
+  admin: 'rol_DsScF2N1RsxByDDY',
+  customer: 'rol_I8NOsYt3mRlmcxq5',
+  supplier: 'rol_zBKeYrrTUJdZsOp0',
+};
+
 export interface IUser {
   createdAt: Date;
   modifiedAt: Date;
   email: string;
-  roles: 'admin' | 'user'[];
+  roles: UserRole[];
   status: 'active' | 'closed';
 
   // fields from auth0
@@ -48,7 +56,7 @@ const userSchema = new mongoose.Schema<IUser>({
   roles: [
     {
       type: String,
-      enum: ['admin', 'user'],
+      enum: ['admin', 'customer', 'supplier'],
       required: true,
     },
   ],

@@ -27,6 +27,9 @@ const profileValidPayload = Joi.object({
 const validCreateUserBody = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().required(),
+  roles: Joi.array()
+    .items(Joi.string().valid('customer', 'supplier', 'admin'))
+    .required(),
 });
 
 export class UserController {
@@ -45,7 +48,7 @@ export class UserController {
     const userId = req.auth?.sub?.split('|')[1];
     const currentUser = await this.userModel
       .findById(userId)
-      .select('-__v -auth0Id -createdAt -tenant -connection -password');
+      .select('-__v -client_id -createdAt -tenant -connection -password');
 
     if (!currentUser) {
       return next(new AppError('Not Found', 404));
@@ -60,14 +63,14 @@ export class UserController {
     const userId = req.auth?.sub?.split('|')[1];
     await this.userModel.findByIdAndUpdate(userId, req.body);
 
-    res.status(201).send();
+    res.sendStatus(201);
   };
 
   closeProfile = async (req: Request, res: Response) => {
     const userId = req.auth?.sub?.split('|')[1];
     await this.userModel.findByIdAndUpdate(userId, { status: 'closed' });
 
-    res.status(201).send();
+    res.sendStatus(201);
   };
 
   updateUser = async (req: Request, res: Response) => {
@@ -76,17 +79,25 @@ export class UserController {
     await profileValidPayload.validateAsync(body);
     await this.userModel.findByIdAndUpdate(req.params['id'], body);
 
-    res.status(201).send();
+    res.sendStatus(201);
   };
 
-  createUser = async (req: Request, res: Response) => {
+  createUser = async (req: Request, res: Response, next: NextFunction) => {
     const { body } = req;
 
     await validCreateUserBody.validateAsync(body);
+    const userAlreadyExists = await this.userModel.findOne({
+      email: body.email,
+    });
+
+    if (userAlreadyExists) {
+      return next(new AppError('User Already exists', 409));
+    }
+
     const { data: token } = await getAuth0Token();
     const { data } = await createAuth0User(body, token.access_token);
 
-    res.status(200).send(data);
+    res.json(data);
   };
 
   deleteUser = async (req: Request, res: Response) => {
@@ -94,6 +105,6 @@ export class UserController {
       status: 'closed',
     });
 
-    res.status(201).send();
+    res.sendStatus(201);
   };
 }

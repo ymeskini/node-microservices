@@ -37,7 +37,8 @@ module.exports = {
     },
     authorizationParams: {
       response_type: 'code',
-      scope: 'openid email read:users create:users update:users delete:users',
+      scope:
+        'openid email profile read:users create:users update:users delete:users',
       audience: process.env.AUTH0_AUDIENCE,
     },
   },

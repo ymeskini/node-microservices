@@ -11,6 +11,7 @@ const authController = new AuthController(User);
 
 authRouter.route('/login').get(authController.login);
 authRouter.route('/token').get(requiresAuth(), authController.getToken);
+authRouter.route('/signup').post(catchAsync(authController.signup));
 
 authRouter.use(jwtCheck);
 authRouter.route('/logout').get(authController.logout);

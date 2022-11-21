@@ -9,23 +9,6 @@ import { User } from './users.model';
 export const userRouter = Router();
 const userController = new UserController(User);
 
-userRouter.use(jwtCheck);
-
-/**
- * @openapi
- * /users/profile:
- *   get:
- *     description: Endpoint to current user profile
- *     responses:
- *       200:
- *         description: Returns user profile.
- */
-userRouter
-  .route('/me')
-  .get(catchAsync(userController.profile))
-  .patch(catchAsync(userController.updateProfile))
-  .delete(catchAsync(userController.closeProfile));
-
 /**
  * @openapi
  * /users:
@@ -54,13 +37,28 @@ userRouter
  *       201:
  *         description: Returns the list of users.
  */
+userRouter.route('/').post(catchAsync(userController.createUser));
+
+userRouter.use(jwtCheck);
+
 userRouter
   .route('/')
-  .post(
-    checkPermissions(['create:users']),
-    catchAsync(userController.createUser),
-  )
   .get(checkPermissions(['read:users']), catchAsync(userController.listUsers));
+
+/**
+ * @openapi
+ * /users/profile:
+ *   get:
+ *     description: Endpoint to current user profile
+ *     responses:
+ *       200:
+ *         description: Returns user profile.
+ */
+userRouter
+  .route('/me')
+  .get(catchAsync(userController.profile))
+  .patch(catchAsync(userController.updateProfile))
+  .delete(catchAsync(userController.closeProfile));
 
 userRouter
   .route('/:id')
