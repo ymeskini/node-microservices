@@ -50,9 +50,16 @@ export class AuthController {
     return res.oidc.logout();
   };
 
-  resetPassword = async (req: Request, res: Response) => {
-    await resetPasswordBodySchema.validateAsync(req.body);
-    await changePasswordRequest(req.body.email);
+  resetPassword = async (req: Request, res: Response, next: NextFunction) => {
+    const currentUser = await this.userModel.findById(
+      req?.auth?.sub?.split('|')[1] as string,
+    );
+
+    if (!currentUser) {
+      return next(new AppError('User does not exist', 404));
+    }
+
+    await changePasswordRequest(currentUser.email);
     res.sendStatus(200);
   };
 
