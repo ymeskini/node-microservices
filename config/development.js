@@ -10,6 +10,7 @@ module.exports = {
   },
   db: {
     url: process.env.MONGODB_URL,
+    dbName: 'db-name',
   },
   swagger: {
     definition: {

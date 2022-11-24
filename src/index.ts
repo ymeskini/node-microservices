@@ -10,15 +10,18 @@ import { initApp } from './app';
 import { initLogger } from './libs/logger';
 
 const logger = initLogger();
-const { app, port } = initApp(logger);
+const app = initApp(logger);
 const server = http.createServer(app);
+const PORT = config.get<number>('server.port');
+const DB_URL = config.get<string>('db.url');
+const DB_NAME = config.get<string>('db.dbName');
 
 mongoose
-  .connect(config.get('db.url'), {
-    dbName: 'db-name',
+  .connect(DB_URL, {
+    dbName: DB_NAME,
   })
   .then(() => {
-    server.listen(port, () => {
-      logger.info(`Server listening at http://localhost:${port}`);
+    server.listen(PORT, () => {
+      logger.info(`Server listening at http://localhost:${PORT}`);
     });
   });

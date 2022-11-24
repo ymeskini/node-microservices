@@ -38,5 +38,5 @@ export const initApp = (logger: Logger) => {
     })
     .use(globalErrorHandler(logger));
 
-  return { app, port: config.get<number>('server.port') };
+  return app;
 };

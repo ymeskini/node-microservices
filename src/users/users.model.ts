@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose, { Document } from 'mongoose';
 
 interface IAddress {
   address: string;
@@ -11,13 +11,13 @@ interface IAddress {
 
 export type UserRole = 'admin' | 'customer' | 'supplier';
 
-export const auth0RolesIds = {
+export const auth0RolesIds: Record<UserRole, string> = {
   admin: 'rol_DsScF2N1RsxByDDY',
   customer: 'rol_I8NOsYt3mRlmcxq5',
   supplier: 'rol_zBKeYrrTUJdZsOp0',
 };
 
-export interface IUser {
+export interface IUser extends Document {
   createdAt: Date;
   modifiedAt: Date;
   email: string;

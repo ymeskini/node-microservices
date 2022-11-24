@@ -18,20 +18,25 @@ const baseData = {
 export const changePasswordRequest = (email: string) =>
   auth0Client.post('/dbconnections/change_password', { email, ...baseData });
 
-export const updateUserEmail = (
-  userId: string,
-  email: string,
-  accessToken: string,
-) =>
+const updateUserRequest = (id: string, data: any, accessToken: string) =>
   auth0Client.patch(
-    `/api/v2/users/${userId}`,
-    { email, verify_email: true, ...baseData },
+    `/api/v2/users/${id}`,
+    { ...data, ...baseData },
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
     },
   );
+
+export const updateUserEmail = (
+  userId: string,
+  email: string,
+  accessToken: string,
+) => updateUserRequest(userId, { email, verify_email: true }, accessToken);
+
+export const blockUser = (userId: string, accessToken: string) =>
+  updateUserRequest(userId, { blocked: true }, accessToken);
 
 type CreateUserBody = {
   email: string;
@@ -86,3 +91,12 @@ export const assignRoleToUser = (
       },
     },
   );
+
+export const deleteAuth0User = async (id: string) => {
+  const { data: token } = await getAuth0Token();
+  return auth0Client.delete(`/api/v2/users/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token.access_token}`,
+    },
+  });
+};

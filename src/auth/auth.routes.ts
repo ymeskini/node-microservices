@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import { requiresAuth } from 'express-openid-connect';
+
 import { jwtCheck } from '../middlewares/auth.middleware';
 import { User } from '../users/users.model';
 import { catchAsync } from '../utils/catchAsync';
-
 import { AuthController } from './auth.controller';
 
 export const authRouter = Router();
