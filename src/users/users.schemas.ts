@@ -23,13 +23,13 @@ export const profileValidPayload = Joi.object({
 });
 
 export const adminUpdateUserPayload = profileValidPayload.keys({
-  roles: Joi.array().items(validRole),
+  roles: Joi.array().items(validRole.required()).required(),
 });
 
 export const validCreateUserBody = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().required(),
-  roles: Joi.array().items(validRole).required(),
+  roles: Joi.array().items(validRole.required()).required(),
 });
 
 export const validIdParamsMongoId = Joi.object({

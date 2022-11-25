@@ -8,10 +8,6 @@ module.exports = {
     host: 'localhost',
     url: 'http://localhost:5555',
   },
-  db: {
-    url: process.env.MONGODB_URL,
-    dbName: 'db-name',
-  },
   swagger: {
     definition: {
       basePath: defer(function () {

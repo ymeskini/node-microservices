@@ -1,19 +1,12 @@
-import { NextFunction, Response } from 'express';
+import { Response } from 'express';
 import { Request } from 'express-jwt';
 import Joi from 'joi';
-import {
-  assignRoleToUser,
-  changePasswordRequest,
-  createAuth0User,
-  getAuth0Token,
-  updateUserEmail,
-} from '../libs/auth0';
-import { UserModel } from '../users/users.model';
-import { AppError } from '../utils/AppError';
 
-const resetPasswordBodySchema = Joi.object({
-  email: Joi.string().email().required(),
-}).required();
+// import { AppError } from '../utils/AppError';
+
+// const resetPasswordBodySchema = Joi.object({
+//   email: Joi.string().email().required(),
+// }).required();
 
 export const signupBodySchema = Joi.object({
   email: Joi.string().email().required(),
@@ -28,11 +21,6 @@ export const signupBodySchema = Joi.object({
 }).required();
 
 export class AuthController {
-  private userModel: UserModel;
-  constructor(userModel: UserModel) {
-    this.userModel = userModel;
-  }
-
   getToken = (req: Request, res: Response) => {
     const { oidc } = req;
 
@@ -50,63 +38,63 @@ export class AuthController {
     return res.oidc.logout();
   };
 
-  resetPassword = async (req: Request, res: Response, next: NextFunction) => {
-    const currentUser = await this.userModel.findById(
-      req?.auth?.sub?.split('|')[1] as string,
-    );
+  // resetPassword = async (req: Request, res: Response, next: NextFunction) => {
+  //   const currentUser = await this.userModel.findById(
+  //     req?.auth?.sub?.split('|')[1] as string,
+  //   );
 
-    if (!currentUser) {
-      return next(new AppError('User does not exist', 404));
-    }
+  //   if (!currentUser) {
+  //     return next(new AppError('User does not exist', 404));
+  //   }
 
-    await changePasswordRequest(currentUser.email);
-    res.sendStatus(200);
-  };
+  //   await changePasswordRequest(currentUser.email);
+  //   res.sendStatus(200);
+  // };
 
-  changeMail = async (req: Request, res: Response, next: NextFunction) => {
-    const { body } = req;
+  // changeMail = async (req: Request, res: Response, next: NextFunction) => {
+  //   const { body } = req;
 
-    await resetPasswordBodySchema.validateAsync(body);
+  //   await resetPasswordBodySchema.validateAsync(body);
 
-    const userExists = await this.userModel.findOne({
-      email: body.email,
-    });
-    if (userExists) {
-      return next(new AppError('Email already taken', 409));
-    }
+  //   const userExists = await this.userModel.findOne({
+  //     email: body.email,
+  //   });
+  //   if (userExists) {
+  //     return next(new AppError('Email already taken', 409));
+  //   }
 
-    const { data: token } = await getAuth0Token();
-    await updateUserEmail(
-      req.auth?.sub as string,
-      body.email,
-      token.access_token,
-    );
-    res.status(201).send();
-  };
+  //   const { data: token } = await getAuth0Token();
+  //   await updateUserEmail(
+  //     req.auth?.sub as string,
+  //     body.email,
+  //     token.access_token,
+  //   );
+  //   res.status(201).send();
+  // };
 
-  signup = async (req: Request, res: Response, next: NextFunction) => {
-    const { body } = req;
+  // signup = async (req: Request, res: Response, next: NextFunction) => {
+  //   const { body } = req;
 
-    await signupBodySchema.validateAsync(body);
+  //   await signupBodySchema.validateAsync(body);
 
-    const userExists = await this.userModel.findOne({
-      email: body.email,
-    });
-    if (userExists) {
-      return next(new AppError('Email already exists', 409));
-    }
+  //   const userExists = await this.userModel.findOne({
+  //     email: body.email,
+  //   });
+  //   if (userExists) {
+  //     return next(new AppError('Email already exists', 409));
+  //   }
 
-    const { data: token } = await getAuth0Token();
-    const { data } = await createAuth0User(
-      {
-        email: body.email,
-        password: body.password,
-      },
-      token.access_token,
-    );
+  //   const { data: token } = await getAuth0Token();
+  //   const { data } = await createAuth0User(
+  //     {
+  //       email: body.email,
+  //       password: body.password,
+  //     },
+  //     token.access_token,
+  //   );
 
-    await assignRoleToUser(data.user_id, ['customer'], token.access_token);
+  //   await assignRoleToUser(data.user_id, ['customer'], token.access_token);
 
-    res.json(data);
-  };
+  //   res.json(data);
+  // };
 }

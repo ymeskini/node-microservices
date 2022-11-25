@@ -1,4 +1,3 @@
-import axios from 'axios';
 import type { ErrorRequestHandler } from 'express';
 import { STATUS_CODES } from 'http';
 import Joi from 'joi';
@@ -8,6 +7,8 @@ import { AppError } from '../utils/AppError';
 
 const handleAuth0TokenError = () => new AppError('Unauthorized', 401);
 const handleJoiError = () => new AppError('Bad Request', 400);
+const handleManagementApiError = (error: any) =>
+  new AppError(STATUS_CODES[error.statusCode] as string, error.statusCode);
 
 // don't remove _next in parameters otherwise the middleware won't work
 export const globalErrorHandler =
@@ -26,12 +27,8 @@ export const globalErrorHandler =
       error = handleJoiError();
     }
 
-    if (axios.isAxiosError(err)) {
-      logger.error(err.response?.data);
-      error = new AppError(
-        err?.response?.statusText || 'Server Error',
-        err?.response?.status || 500,
-      );
+    if (err.originalError) {
+      error = handleManagementApiError(error);
     }
 
     if (err.message === 'Insufficient scope') {
