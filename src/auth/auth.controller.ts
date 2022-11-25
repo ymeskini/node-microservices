@@ -2,12 +2,6 @@ import { Response } from 'express';
 import { Request } from 'express-jwt';
 import Joi from 'joi';
 
-// import { AppError } from '../utils/AppError';
-
-// const resetPasswordBodySchema = Joi.object({
-//   email: Joi.string().email().required(),
-// }).required();
-
 export const signupBodySchema = Joi.object({
   email: Joi.string().email().required(),
   // should follow the password policy set in auth0
@@ -37,64 +31,4 @@ export class AuthController {
   logout = (_req: Request, res: Response) => {
     return res.oidc.logout();
   };
-
-  // resetPassword = async (req: Request, res: Response, next: NextFunction) => {
-  //   const currentUser = await this.userModel.findById(
-  //     req?.auth?.sub?.split('|')[1] as string,
-  //   );
-
-  //   if (!currentUser) {
-  //     return next(new AppError('User does not exist', 404));
-  //   }
-
-  //   await changePasswordRequest(currentUser.email);
-  //   res.sendStatus(200);
-  // };
-
-  // changeMail = async (req: Request, res: Response, next: NextFunction) => {
-  //   const { body } = req;
-
-  //   await resetPasswordBodySchema.validateAsync(body);
-
-  //   const userExists = await this.userModel.findOne({
-  //     email: body.email,
-  //   });
-  //   if (userExists) {
-  //     return next(new AppError('Email already taken', 409));
-  //   }
-
-  //   const { data: token } = await getAuth0Token();
-  //   await updateUserEmail(
-  //     req.auth?.sub as string,
-  //     body.email,
-  //     token.access_token,
-  //   );
-  //   res.status(201).send();
-  // };
-
-  // signup = async (req: Request, res: Response, next: NextFunction) => {
-  //   const { body } = req;
-
-  //   await signupBodySchema.validateAsync(body);
-
-  //   const userExists = await this.userModel.findOne({
-  //     email: body.email,
-  //   });
-  //   if (userExists) {
-  //     return next(new AppError('Email already exists', 409));
-  //   }
-
-  //   const { data: token } = await getAuth0Token();
-  //   const { data } = await createAuth0User(
-  //     {
-  //       email: body.email,
-  //       password: body.password,
-  //     },
-  //     token.access_token,
-  //   );
-
-  //   await assignRoleToUser(data.user_id, ['customer'], token.access_token);
-
-  //   res.json(data);
-  // };
 }

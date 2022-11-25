@@ -1,6 +1,8 @@
 import { ManagementClient } from 'auth0';
-import type { CreateUserData } from 'auth0';
 import config from 'config';
+
+import { auth0RolesIds, UserRole } from './users.model';
+import { CreateUserDto, PutUserDto, PutUserMetadataDto } from './users.dto';
 
 export class UserService {
   private auth0: ManagementClient;
@@ -26,10 +28,36 @@ export class UserService {
     return this.auth0.getUser({ id });
   };
 
-  createUser = (data: Omit<CreateUserData, 'connection'>) => {
-    return this.auth0.createUser({
+  createUser = async (
+    data: CreateUserDto,
+    roles: UserRole[] = ['customer'],
+  ) => {
+    const user = await this.auth0.createUser({
       ...data,
       connection: 'Username-Password-Authentication',
+      verify_email: true,
     });
+
+    await this.auth0.assignRolestoUser(
+      { id: user.user_id as string },
+      { roles: roles.map((role) => auth0RolesIds[role]) },
+    );
+
+    return user;
+  };
+
+  deleteUser = async (id: string) => {
+    return this.auth0.deleteUser({ id });
+  };
+
+  putUser = async (
+    id: string,
+    data: PutUserDto,
+    userMetadata: PutUserMetadataDto,
+  ) => {
+    return this.auth0.updateUser(
+      { id },
+      { user_metadata: userMetadata, ...data },
+    );
   };
 }

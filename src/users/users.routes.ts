@@ -1,31 +1,31 @@
 import { Router } from 'express';
-import Joi from 'joi';
 import { isAdmin } from '../middlewares/admin.middleware';
 
 import { jwtCheck } from '../middlewares/auth.middleware';
-import { checkPermissions } from '../middlewares/permission.middleware';
-import { validate } from '../middlewares/validate.middleware';
 import { catchAsync } from '../utils/catchAsync';
 import { UserController } from './users.controller';
 import {
-  // adminUpdateUserPayload,
+  validAdminCreateUserBody,
   validCreateUserBody,
-  // validIdParamsMongoId,
+  validPutUserBody,
 } from './users.schemas';
 import { UserService } from './users.service';
 
-const userService = new UserService();
 export const userRouter = Router();
-const userController = new UserController(userService);
+
+const userController = new UserController(new UserService());
 
 userRouter.route('/').post(
   jwtCheck(false),
   isAdmin,
-  validate(
-    Joi.object({
-      body: validCreateUserBody.required(),
-    }),
-  ),
+  catchAsync(async (req, _res, next) => {
+    if (req.isAdmin) {
+      await validAdminCreateUserBody.validateAsync(req.body);
+      return next();
+    }
+    await validCreateUserBody.validateAsync(req.body);
+    next();
+  }),
   catchAsync(userController.createUser),
 );
 
@@ -33,32 +33,24 @@ userRouter.use(jwtCheck(true));
 
 userRouter.get(
   '/',
-  checkPermissions(['read:users']),
+  // checkPermissions(['read:users']), // TODO FIX
   catchAsync(userController.listUsers),
 );
 
-userRouter.get('/:id', catchAsync(userController.getUser));
+userRouter.get('/:id', isAdmin, catchAsync(userController.getUser));
 
-// userRouter
-//   .route('/:id')
-//   .all(
-//     validate(
-//       Joi.object({
-//         params: validIdParamsMongoId.required(),
-//       }),
-//     ),
-//   )
-//   .get(checkPermissions(['read:users']), catchAsync(userController.getUser))
-//   .delete(
-//     checkPermissions(['delete:users']),
-//     catchAsync(userController.deleteUser),
-//   )
-//   .patch(
-//     checkPermissions(['update:users']),
-//     validate(
-//       Joi.object({
-//         body: adminUpdateUserPayload.required().keys().min(1).required(),
-//       }),
-//     ),
-//     catchAsync(userController.updateUser),
-//   );
+userRouter.delete('/:id', isAdmin, catchAsync(userController.deleteUser));
+
+userRouter.put(
+  '/:id',
+  isAdmin,
+  catchAsync(async (req, _res, next) => {
+    if (req.isAdmin) {
+      await validAdminCreateUserBody.validateAsync(req.body);
+      return next();
+    }
+    await validPutUserBody.validateAsync(req.body);
+    next();
+  }),
+  catchAsync(userController.putUser),
+);

@@ -2,7 +2,6 @@ import { NextFunction, Response } from 'express';
 import { Request } from 'express-jwt';
 import { AppError } from '../utils/AppError';
 
-// import { AppError } from '../utils/AppError';
 import { UserService } from './users.service';
 
 const DEFAULT_LIMIT = 50;
@@ -16,11 +15,11 @@ export class UserController {
   }
 
   getUser = async (req: Request, res: Response, next: NextFunction) => {
-    const user = await this.userService.getUser(req.params['id'] as string);
-
-    if (!user) {
-      return next(new AppError('User not found', 404));
+    const userId = req.params['id'] as string;
+    if (!req.isAdmin && req.auth?.sub !== userId) {
+      return next(new AppError('Forbidden', 403));
     }
+    const user = await this.userService.getUser(userId);
 
     res.json(user);
   };
@@ -37,35 +36,26 @@ export class UserController {
 
   createUser = async (req: Request, res: Response) => {
     const { body } = req;
-    console.log(req.isAdmin);
-    // const user = await this.userService.createUser(body);
+    const { roles, ...userData } = body;
 
-    res.json(body);
+    const user = await this.userService.createUser(userData, roles);
+
+    res.json(user);
   };
 
-  // updateUser = async (req: Request, res: Response) => {
-  //   const { body } = req;
+  deleteUser = async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.params['id'] as string;
 
-  //   await this.userModel.findByIdAndUpdate(req.params['id'], body);
+    if (!req.isAdmin && userId !== req.auth?.sub) {
+      return next(new AppError('Forbidden', 403));
+    }
 
-  //   res.json({
-  //     id: req.params['id'],
-  //   });
-  // };
+    await this.userService.deleteUser(userId);
 
-  //   const { data: token } = await getAuth0Token();
-  //   const { data } = await createAuth0User(body, token.access_token);
+    res.sendStatus(204);
+  };
 
-  //   res.json(data);
-  // };
-
-  // deleteUser = async (req: Request, res: Response) => {
-  //   const userId = req.params['id'] as string;
-
-  //   await this.userModel.findByIdAndUpdate(userId, { status: 'closed' });
-
-  //   const { data: token } = await getAuth0Token();
-  //   await blockUser(`auth0|${userId}`, token.access_token);
-  //   res.sendStatus(204);
-  // };
+  putUser = async (req: Request, res: Response) => {
+    res.json(req.body);
+  };
 }
