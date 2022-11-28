@@ -1,20 +1,14 @@
 import { ManagementClient } from 'auth0';
-import config from 'config';
 
 import { auth0RolesIds, UserRole } from './users.model';
 import { CreateUserDto, PutUserDto, PutUserMetadataDto } from './users.dto';
+import { auth0 } from '../libs/auth0';
 
 export class UserService {
   private auth0: ManagementClient;
 
   constructor() {
-    this.auth0 = new ManagementClient({
-      domain: process.env['AUTH0_DOMAIN'] as string,
-      clientId: config.get('auth0.clientID'),
-      clientSecret: config.get('auth0.clientSecret'),
-      scope:
-        'read:users update:users create:users create:users_app_metadata delete:users delete:users_app_metadata',
-    });
+    this.auth0 = auth0;
   }
 
   getUsers = (limit: number, offset: number) => {
@@ -54,7 +48,41 @@ export class UserService {
     id: string,
     data: PutUserDto,
     userMetadata: PutUserMetadataDto,
+    roles?: UserRole[],
   ) => {
+    if (roles) {
+      const currentUserRoles = await this.auth0.getUserRoles({ id });
+      const currentUserRoleNames = currentUserRoles.map((r) => r.name);
+      const rolesToRemoveFromUser = currentUserRoleNames.filter((role) => {
+        return !roles.includes(role as UserRole);
+      }) as string[];
+
+      const rolesToAssignToUser = roles.filter((role) => {
+        return !currentUserRoleNames.includes(role as UserRole);
+      }) as string[];
+
+      if (rolesToRemoveFromUser.length > 0) {
+        this.auth0.removeRolesFromUser(
+          { id },
+          {
+            roles: rolesToRemoveFromUser.map(
+              (role) => auth0RolesIds[role as UserRole],
+            ),
+          },
+        );
+      }
+
+      if (rolesToAssignToUser.length > 0) {
+        await this.auth0.assignRolestoUser(
+          { id },
+          {
+            roles: rolesToAssignToUser.map(
+              (role) => auth0RolesIds[role as UserRole],
+            ),
+          },
+        );
+      }
+    }
     return this.auth0.updateUser(
       { id },
       { user_metadata: userMetadata, ...data },

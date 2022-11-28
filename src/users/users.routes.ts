@@ -1,12 +1,16 @@
 import { Router } from 'express';
-import { isAdmin } from '../middlewares/admin.middleware';
 
+import { isAdmin } from '../middlewares/admin.middleware';
 import { jwtCheck } from '../middlewares/auth.middleware';
+import { checkAuthz } from '../middlewares/authz.middleware';
 import { catchAsync } from '../utils/catchAsync';
 import { UserController } from './users.controller';
 import {
   validAdminCreateUserBody,
+  validAdminPatchUserBody,
+  validAdminPutUserBody,
   validCreateUserBody,
+  validPatchUserBody,
   validPutUserBody,
 } from './users.schemas';
 import { UserService } from './users.service';
@@ -33,7 +37,7 @@ userRouter.use(jwtCheck(true));
 
 userRouter.get(
   '/',
-  // checkPermissions(['read:users']), // TODO FIX
+  checkAuthz('read:users'),
   catchAsync(userController.listUsers),
 );
 
@@ -46,11 +50,25 @@ userRouter.put(
   isAdmin,
   catchAsync(async (req, _res, next) => {
     if (req.isAdmin) {
-      await validAdminCreateUserBody.validateAsync(req.body);
+      await validAdminPutUserBody.validateAsync(req.body);
       return next();
     }
     await validPutUserBody.validateAsync(req.body);
     next();
   }),
   catchAsync(userController.putUser),
+);
+
+userRouter.patch(
+  '/:id',
+  isAdmin,
+  catchAsync(async (req, _res, next) => {
+    if (req.isAdmin) {
+      await validAdminPatchUserBody.validateAsync(req.body);
+      return next();
+    }
+    await validPatchUserBody.validateAsync(req.body);
+    next();
+  }),
+  catchAsync(userController.patchUser),
 );

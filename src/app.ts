@@ -10,12 +10,16 @@ import { userRouter } from './users/users.routes';
 import { AppError } from './utils/AppError';
 import { authRouter } from './auth/auth.routes';
 import { oicdMiddleware } from './middlewares/auth.middleware';
+import { analyticsRouter } from './analytics/analytics.router';
 
 export const initApp = (logger: Logger) => {
   const app = express();
   const v1Router = Router();
 
-  v1Router.use('/users', userRouter).use('/auth', authRouter);
+  v1Router
+    .use('/users', userRouter)
+    .use('/auth', authRouter)
+    .use('/analytics', analyticsRouter);
 
   app
     .disable('x-powered-by')

@@ -55,7 +55,37 @@ export class UserController {
     res.sendStatus(204);
   };
 
-  putUser = async (req: Request, res: Response) => {
-    res.json(req.body);
+  putUser = async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.params['id'] as string;
+
+    if (!req.isAdmin && userId !== req.auth?.sub) {
+      return next(new AppError('Forbidden', 403));
+    }
+
+    const user = await this.userService.putUser(
+      userId,
+      req.body.user,
+      req.body.userMetadata,
+      req.body.roles,
+    );
+
+    res.json(user);
+  };
+
+  patchUser = async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.params['id'] as string;
+
+    if (!req.isAdmin && userId !== req.auth?.sub) {
+      return next(new AppError('Forbidden', 403));
+    }
+
+    const user = await this.userService.putUser(
+      userId,
+      req.body.user,
+      req.body.userMetadata,
+      req.body.roles,
+    );
+
+    res.json(user);
   };
 }
