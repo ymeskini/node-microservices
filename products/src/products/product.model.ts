@@ -6,8 +6,5 @@ export class Product {
   id: number;
 
   @Field({ nullable: true })
-  firstName?: string;
-
-  @Field({ nullable: true })
-  lastName?: string;
+  name?: string;
 }

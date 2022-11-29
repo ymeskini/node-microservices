@@ -4,6 +4,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { ProductModule } from './products/product.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { AppService } from './app.service';
       autoSchemaFile: 'schema.gql',
       installSubscriptionHandlers: true,
     }),
+    ProductModule,
   ],
   controllers: [AppController],
   providers: [AppService],
