@@ -3,10 +3,10 @@
 # ------------------------------------------------------
 
 type Product {
-  id: Int!
-  name: String
+  _id: String!
+  name: String!
 }
 
 type Query {
-  author(id: Int!): Product!
+  findOneProduct(id: String!): Product!
 }

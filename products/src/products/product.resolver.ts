@@ -1,14 +1,14 @@
-import { Args, Int, Query, Resolver } from '@nestjs/graphql';
+import { Args, Query, Resolver } from '@nestjs/graphql';
 
-import { Product } from './product.model';
+import { Product } from './product.schema';
 import { ProductService } from './product.service';
 
-@Resolver((of) => Product)
+@Resolver(() => Product)
 export class ProductResolver {
   constructor(private productsService: ProductService) {}
 
-  @Query((returns) => Product)
-  async author(@Args('id', { type: () => Int }) id: number) {
+  @Query(() => Product)
+  findOneProduct(@Args('id', { type: () => String }) id: string) {
     return this.productsService.findOneById(id);
   }
 }
