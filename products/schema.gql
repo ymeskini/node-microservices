@@ -9,4 +9,13 @@ type Product {
 
 type Query {
   findOneProduct(id: String!): Product!
+  getProducts: [Product!]!
+}
+
+type Mutation {
+  createProduct(createProductInput: CreateProductInput!): Product!
+}
+
+input CreateProductInput {
+  name: String!
 }
