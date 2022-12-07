@@ -13,6 +13,20 @@ const analyticsController = new AnalyticsController(analyticsService);
 
 analyticsRouter.use(jwtCheck(true));
 
+/**
+ * @openapi
+ * /api/v1/analytics:
+ *   get:
+ *     tags:
+ *       - analytics
+ *     responses:
+ *       200:
+ *         description: Successfully returns analytics of a user
+ *       401:
+ *         description: The token is absent/invalid/expired
+ *       403:
+ *         description: You're not allowed to access this resource
+ */
 analyticsRouter.get(
   '/',
   checkAuthz('read:users'),

@@ -1,6 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const defer = require('config/defer').deferConfig;
-
 module.exports = {
   DEBUG: true,
   server: {
@@ -10,11 +7,9 @@ module.exports = {
   },
   swagger: {
     definition: {
-      basePath: defer(function () {
-        return this.server.url + '/api/v1';
-      }),
+      tags: [{ name: 'auth' }, { name: 'users' }, { name: 'analytics' }],
       info: {
-        title: 'Users API',
+        title: 'User microservice',
         version: '1.0.0',
       },
     },

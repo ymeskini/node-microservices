@@ -10,7 +10,7 @@ import { userRouter } from './users/users.routes';
 import { AppError } from './utils/AppError';
 import { authRouter } from './auth/auth.routes';
 import { oicdMiddleware } from './middlewares/auth.middleware';
-import { analyticsRouter } from './analytics/analytics.router';
+import { analyticsRouter } from './analytics/analytics.routes';
 
 export const initApp = (logger: Logger) => {
   const app = express();
