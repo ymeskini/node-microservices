@@ -1,9 +1,10 @@
 import { InputType, Field } from '@nestjs/graphql';
-import { MinLength } from 'class-validator';
 
 @InputType()
-export class CreateProductInput {
+export class UpdateProductInput {
   @Field()
-  @MinLength(3)
+  id: string;
+
+  @Field()
   name: string;
 }

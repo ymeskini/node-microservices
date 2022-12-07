@@ -2,20 +2,44 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Image {
+  _id: String!
+  url: String!
+  productId: String!
+}
+
 type Product {
   _id: String!
   name: String!
+  images: [Image!]!
 }
 
 type Query {
-  findOneProduct(id: String!): Product!
+  getProduct(id: String!): Product!
   getProducts: [Product!]!
 }
 
 type Mutation {
   createProduct(createProductInput: CreateProductInput!): Product!
+  updateProduct(updateProductInput: UpdateProductInput!): Product!
+  deleteProduct(deleteProductInput: DeleteProductInput!): String!
+  createImage(createImageInput: CreateImageInput!): Image!
 }
 
 input CreateProductInput {
   name: String!
+}
+
+input UpdateProductInput {
+  id: String!
+  name: String!
+}
+
+input DeleteProductInput {
+  id: String!
+}
+
+input CreateImageInput {
+  url: String!
+  productId: String!
 }

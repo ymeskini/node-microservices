@@ -1,16 +1,30 @@
 import { UseGuards } from '@nestjs/common';
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
 
+import { ImageService } from '../images/image.service';
 import { GqlAuthGuard } from '../auth/auth.guard';
 import { Permissions } from '../auth/permissions.decorator';
 import { PermissionsGuard } from '../auth/permissions.guard';
 import { CreateProductInput } from './dto/create-product.input';
+import { DeleteProductInput } from './dto/delete-product.input';
+import { UpdateProductInput } from './dto/update-product.input';
 import { Product } from './product.schema';
 import { ProductService } from './product.service';
+import { Image } from '../images/image.schema';
 
 @Resolver(() => Product)
 export class ProductResolver {
-  constructor(private productsService: ProductService) {}
+  constructor(
+    private productsService: ProductService,
+    private imageService: ImageService,
+  ) {}
 
   @Mutation(() => Product)
   @UseGuards(GqlAuthGuard, PermissionsGuard)
@@ -21,13 +35,37 @@ export class ProductResolver {
     return this.productsService.create(createProductInput);
   }
 
+  @Mutation(() => Product)
+  @UseGuards(GqlAuthGuard, PermissionsGuard)
+  @Permissions('update:products')
+  updateProduct(
+    @Args('updateProductInput') updateProductInput: UpdateProductInput,
+  ) {
+    return this.productsService.create(updateProductInput);
+  }
+
+  @Mutation(() => String)
+  @UseGuards(GqlAuthGuard, PermissionsGuard)
+  @Permissions('delete:products')
+  deleteProduct(
+    @Args('deleteProductInput') deleteProductInput: DeleteProductInput,
+  ) {
+    return this.productsService.delete(deleteProductInput);
+  }
+
   @Query(() => Product)
-  findOneProduct(@Args('id', { type: () => String }) id: string) {
+  getProduct(@Args('id', { type: () => String }) id: string) {
     return this.productsService.findOneById(id);
   }
 
   @Query(() => [Product])
   getProducts() {
     return this.productsService.getProducts();
+  }
+
+  @ResolveField('images', () => [Image])
+  async getProductImages(@Parent() product: Product) {
+    const { _id } = product;
+    return this.imageService.getImagesByProductId(_id);
   }
 }
