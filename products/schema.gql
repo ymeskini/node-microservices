@@ -24,6 +24,9 @@ type Mutation {
   updateProduct(updateProductInput: UpdateProductInput!): Product!
   deleteProduct(deleteProductInput: DeleteProductInput!): String!
   createImage(createImageInput: CreateImageInput!): Image!
+  deleteImage(deleteImageInput: DeleteImageInput!): String!
+  updateImage(updateImageInput: UpdateImageInput!): Image!
+  bulkUpdateImages(bulkUpdateImagesInput: BulkUpdateImagesInput!): [String!]!
 }
 
 input CreateProductInput {
@@ -42,4 +45,22 @@ input DeleteProductInput {
 input CreateImageInput {
   url: String!
   productId: String!
+}
+
+input DeleteImageInput {
+  imageId: String!
+}
+
+input UpdateImageInput {
+  imageId: String!
+  url: String!
+}
+
+input BulkUpdateImagesInput {
+  images: [UpdateImageBody!]!
+}
+
+input UpdateImageBody {
+  id: String!
+  url: String!
 }

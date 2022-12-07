@@ -35,12 +35,19 @@ export class ProductService {
   async update(userInput: UpdateProductInput) {
     const { id, ...body } = userInput;
     const productUpdated = await this.productModel.findByIdAndUpdate(id, body);
-
+    if (!productUpdated) {
+      throw new NotFoundException(`Product ${id} not found`);
+    }
     return productUpdated;
   }
 
   async delete(userInput: DeleteProductInput) {
-    const { _id } = await this.productModel.findByIdAndRemove(userInput.id);
-    return _id;
+    const productDeleted = await this.productModel.findByIdAndRemove(
+      userInput.id,
+    );
+    if (!productDeleted) {
+      throw new NotFoundException(`Product ${userInput.id} not found`);
+    }
+    return { _id: productDeleted._id };
   }
 }

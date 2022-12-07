@@ -47,10 +47,12 @@ export class ProductResolver {
   @Mutation(() => String)
   @UseGuards(GqlAuthGuard, PermissionsGuard)
   @Permissions('delete:products')
-  deleteProduct(
+  async deleteProduct(
     @Args('deleteProductInput') deleteProductInput: DeleteProductInput,
   ) {
-    return this.productsService.delete(deleteProductInput);
+    const { _id } = await this.productsService.delete(deleteProductInput);
+    await this.imageService.addDeleteImagesJob(_id);
+    return _id;
   }
 
   @Query(() => Product)
