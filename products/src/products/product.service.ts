@@ -1,9 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 
+import { CreateProductVariantInput } from './dto/create-product-variant.input';
 import { CreateProductInput } from './dto/create-product.input';
+import { DeleteProductVariantInput } from './dto/delete-product-variant.input';
 import { DeleteProductInput } from './dto/delete-product.input';
+import { UpdateProductVariantInput } from './dto/update-product-variant.input';
 import { UpdateProductInput } from './dto/update-product.input';
 import { Product, ProductDocument } from './product.schema';
 
@@ -50,5 +53,46 @@ export class ProductService {
       throw new NotFoundException(`Product ${userInput.id} not found`);
     }
     return { _id: productDeleted._id };
+  }
+
+  async deleteProductVariant(userInput: DeleteProductVariantInput) {
+    const { productId, variantId } = userInput;
+    await this.productModel.findByIdAndUpdate(productId, {
+      $pull: { variants: { _id: new Types.ObjectId(variantId) } },
+    });
+    return variantId;
+  }
+
+  async updateProductVariant(userInput: UpdateProductVariantInput) {
+    const { productId, variantId, ...body } = userInput;
+    await this.productModel.findByIdAndUpdate(
+      productId,
+      {
+        $set: {
+          'variants.$[variant]': {
+            ...body,
+            _id: new Types.ObjectId(variantId),
+          },
+        },
+      },
+      {
+        arrayFilters: [
+          {
+            'variant._id': new Types.ObjectId(variantId),
+          },
+        ],
+      },
+    );
+
+    return variantId;
+  }
+
+  async createProductVariant(userInput: CreateProductVariantInput) {
+    const { productId, ...body } = userInput;
+    const _id = new Types.ObjectId();
+    await this.productModel.findByIdAndUpdate(productId, {
+      $push: { variants: { ...body, _id } },
+    });
+    return _id;
   }
 }

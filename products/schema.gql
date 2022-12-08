@@ -7,9 +7,16 @@ type Image {
   productId: String!
 }
 
+type ProductVariant {
+  _id: String!
+  name: String!
+  sku: Int!
+}
+
 type Product {
   name: String!
   images: [Image!]!
+  variants: [ProductVariant!]!
 }
 
 type Query {
@@ -21,6 +28,9 @@ type Mutation {
   createProduct(createProductInput: CreateProductInput!): Product!
   updateProduct(updateProductInput: UpdateProductInput!): Product!
   deleteProduct(deleteProductInput: DeleteProductInput!): String!
+  createProductVariant(createProductVariant: CreateProductVariantInput!): String!
+  deleteProductVariant(deleteProductVariant: DeleteProductVariantInput!): String!
+  updateProductVariant(updateProductVariant: UpdateProductVariantInput!): String!
   createImage(createImageInput: CreateImageInput!): Image!
   deleteImage(deleteImageInput: DeleteImageInput!): String!
   updateImage(updateImageInput: UpdateImageInput!): Image!
@@ -38,6 +48,24 @@ input UpdateProductInput {
 
 input DeleteProductInput {
   id: String!
+}
+
+input CreateProductVariantInput {
+  name: String!
+  sku: Float!
+  productId: String!
+}
+
+input DeleteProductVariantInput {
+  productId: String!
+  variantId: String!
+}
+
+input UpdateProductVariantInput {
+  name: String!
+  sku: Float!
+  productId: String!
+  variantId: String!
 }
 
 input CreateImageInput {

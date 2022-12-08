@@ -1,6 +1,6 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { HydratedDocument, ObjectId } from 'mongoose';
+import { HydratedDocument, ObjectId, Types } from 'mongoose';
 
 export type ImageDocument = HydratedDocument<Image>;
 
@@ -11,7 +11,7 @@ export class Image {
   @Field(() => String)
   url: string;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Product' })
+  @Prop({ type: Types.ObjectId, ref: 'Product' })
   @Field(() => String)
   productId: ObjectId;
 }

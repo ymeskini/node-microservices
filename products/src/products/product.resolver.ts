@@ -18,6 +18,9 @@ import { UpdateProductInput } from './dto/update-product.input';
 import { Product, ProductDocument } from './product.schema';
 import { ProductService } from './product.service';
 import { Image } from '../images/image.schema';
+import { CreateProductVariantInput } from './dto/create-product-variant.input';
+import { DeleteProductVariantInput } from './dto/delete-product-variant.input';
+import { UpdateProductVariantInput } from './dto/update-product-variant.input';
 
 @Resolver(() => Product)
 export class ProductResolver {
@@ -69,5 +72,35 @@ export class ProductResolver {
   async getProductImages(@Parent() product: ProductDocument) {
     const { _id } = product;
     return this.imageService.getImagesByProductId(_id);
+  }
+
+  @Mutation(() => String)
+  @UseGuards(GqlAuthGuard, PermissionsGuard)
+  @Permissions('create:products')
+  createProductVariant(
+    @Args('createProductVariant')
+    createProductVariant: CreateProductVariantInput,
+  ) {
+    return this.productsService.createProductVariant(createProductVariant);
+  }
+
+  @Mutation(() => String)
+  @UseGuards(GqlAuthGuard, PermissionsGuard)
+  @Permissions('delete:products')
+  deleteProductVariant(
+    @Args('deleteProductVariant')
+    deleteProductVariant: DeleteProductVariantInput,
+  ) {
+    return this.productsService.deleteProductVariant(deleteProductVariant);
+  }
+
+  @Mutation(() => String)
+  @UseGuards(GqlAuthGuard, PermissionsGuard)
+  @Permissions('update:products')
+  updateProductVariant(
+    @Args('updateProductVariant')
+    updateProductVariant: UpdateProductVariantInput,
+  ) {
+    return this.productsService.updateProductVariant(updateProductVariant);
   }
 }
