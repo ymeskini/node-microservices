@@ -15,7 +15,7 @@ import { PermissionsGuard } from '../auth/permissions.guard';
 import { CreateProductInput } from './dto/create-product.input';
 import { DeleteProductInput } from './dto/delete-product.input';
 import { UpdateProductInput } from './dto/update-product.input';
-import { Product } from './product.schema';
+import { Product, ProductDocument } from './product.schema';
 import { ProductService } from './product.service';
 import { Image } from '../images/image.schema';
 
@@ -66,7 +66,7 @@ export class ProductResolver {
   }
 
   @ResolveField('images', () => [Image])
-  async getProductImages(@Parent() product: Product) {
+  async getProductImages(@Parent() product: ProductDocument) {
     const { _id } = product;
     return this.imageService.getImagesByProductId(_id);
   }

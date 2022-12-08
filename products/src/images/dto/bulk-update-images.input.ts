@@ -1,13 +1,12 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { IsMongoId, IsUrl } from 'class-validator';
-import { ObjectId } from 'mongoose';
 
 @ObjectType()
 @InputType()
 class UpdateImageBody {
   @IsMongoId()
   @Field(() => String)
-  id: ObjectId;
+  id: string;
 
   @IsUrl()
   @Field(() => String)

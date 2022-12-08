@@ -1,10 +1,10 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { IsMongoId } from 'class-validator';
-import { ObjectId } from 'mongoose';
+import { Types } from 'mongoose';
 
 @InputType()
 export class DeleteImageInput {
   @IsMongoId()
   @Field(() => String)
-  imageId: ObjectId;
+  imageId: Types.ObjectId;
 }

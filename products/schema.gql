@@ -3,13 +3,11 @@
 # ------------------------------------------------------
 
 type Image {
-  _id: String!
   url: String!
   productId: String!
 }
 
 type Product {
-  _id: String!
   name: String!
   images: [Image!]!
 }

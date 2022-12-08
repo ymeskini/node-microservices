@@ -2,18 +2,18 @@ import { InjectQueue } from '@nestjs/bull';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Queue } from 'bull';
-import { Model, ObjectId } from 'mongoose';
+import { Model, Types } from 'mongoose';
 
 import { BulkUpdateImagesInput } from './dto/bulk-update-images.input';
 import { CreateImageInput } from './dto/create-image.input';
 import { UpdateImageInput } from './dto/update-image.input';
-import { Image } from './image.schema';
+import { Image, ImageDocument } from './image.schema';
 
 @Injectable()
 export class ImageService {
   constructor(
     @InjectModel(Image.name)
-    private readonly imageModel: Model<Image>,
+    private readonly imageModel: Model<ImageDocument>,
     @InjectQueue('images') private readonly deleteImagesQueue: Queue,
   ) {}
 
@@ -23,13 +23,13 @@ export class ImageService {
     return image;
   }
 
-  async getImagesByProductId(id: ObjectId) {
+  async getImagesByProductId(id: Types.ObjectId) {
     const images = await this.imageModel.find({ productId: id });
 
     return images;
   }
 
-  async deleteImage(id: ObjectId) {
+  async deleteImage(id: Types.ObjectId) {
     const image = await this.imageModel.findByIdAndRemove(id);
     if (!image) {
       throw new NotFoundException(`Image with ${id} not found`);
@@ -50,23 +50,25 @@ export class ImageService {
   }
 
   async updateImages(userInput: BulkUpdateImagesInput) {
-    const result = await this.imageModel.bulkWrite(
-      userInput.images.map(({ id, ...body }) => ({
-        updateOne: {
-          filter: { _id: id },
-          update: { body },
-        },
-      })),
+    await this.imageModel.bulkWrite(
+      userInput.images.map((image) => {
+        return {
+          updateOne: {
+            filter: { _id: new Types.ObjectId(image.id) },
+            update: { $set: { url: image.url } },
+          },
+        };
+      }),
     );
 
-    return result.upsertedIds;
+    return userInput.images.map(({ id }) => id);
   }
 
-  deleteImagesOfProduct(id: ObjectId) {
+  deleteImagesOfProduct(id: Types.ObjectId) {
     return this.imageModel.deleteMany({ productId: id });
   }
 
-  addDeleteImagesJob(id: ObjectId) {
+  addDeleteImagesJob(id: Types.ObjectId) {
     return this.deleteImagesQueue.add(
       'deleteImages',
       { productId: id },
