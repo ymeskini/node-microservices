@@ -7,10 +7,10 @@ export interface UserAddress {
   label: string;
 }
 
-export type UserRole = 'admin' | 'customer' | 'supplier';
-
-export const auth0RolesIds: Record<UserRole, string> = {
+export const auth0RolesIds = {
   admin: 'rol_DsScF2N1RsxByDDY',
   customer: 'rol_I8NOsYt3mRlmcxq5',
   supplier: 'rol_zBKeYrrTUJdZsOp0',
-};
+} as const;
+
+export type UserRole = keyof typeof auth0RolesIds;

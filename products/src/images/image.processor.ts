@@ -6,7 +6,6 @@ import { ImageService } from './image.service';
 @Processor('images')
 export class ImageProcessor {
   private readonly logger = new Logger(ImageProcessor.name);
-
   constructor(private imageService: ImageService) {}
 
   @Process('deleteImages')
