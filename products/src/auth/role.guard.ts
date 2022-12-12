@@ -1,29 +1,30 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { Reflector } from '@nestjs/core';
-import { Permission } from './user.decorator';
+
+import { User, UserRole } from './user.decorator';
 
 @Injectable()
-export class PermissionsGuard implements CanActivate {
+export class RolesGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
 
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    const routePermissions = this.reflector.get<Permission[]>(
-      'permissions',
+    const routeRoles = this.reflector.get<UserRole[]>(
+      'roles',
       context.getHandler(),
     );
-    const user = context.getArgs()[2].req.user;
-    const userPermissions = user.permissions;
+    const user = context.getArgs()[2].req.user as User;
+    const userRoles = user['https://ym-toptal-users.com/roles'];
 
-    if (!routePermissions) {
+    if (!routeRoles) {
       return true;
     }
 
     const hasPermission = () =>
-      routePermissions.every((routePermission) =>
-        userPermissions.includes(routePermission),
+      routeRoles.every((routePermission) =>
+        userRoles.includes(routePermission),
       );
 
     return hasPermission();

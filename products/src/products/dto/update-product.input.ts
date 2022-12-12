@@ -7,4 +7,7 @@ export class UpdateProductInput {
 
   @Field()
   name: string;
+
+  @Field(() => [String], { nullable: true })
+  categories: string[];
 }

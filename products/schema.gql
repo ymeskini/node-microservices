@@ -15,13 +15,40 @@ type ProductVariant {
 
 type Product {
   name: String!
+  createdAt: DateTime!
+  modifiedAt: DateTime!
+  categories: [String!]!
+  userId: String!
   images: [Image!]!
   variants: [ProductVariant!]!
 }
 
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Analytics {
+  event: String!
+  userId: String!
+  date: DateTime!
+  productId: String!
+}
+
 type Query {
+  getProductAnalytics(getAnalyticsInput: GetAnalyticsInput!): [Analytics!]
   getProduct(id: String!): Product!
-  getProducts: [Product!]!
+  getProducts(getProductsInput: GetProductsInput): [Product!]
+}
+
+input GetAnalyticsInput {
+  productId: String!
+}
+
+input GetProductsInput {
+  categories: [String!]
+  createdAt: DateTime
+  name: String
 }
 
 type Mutation {
@@ -39,11 +66,13 @@ type Mutation {
 
 input CreateProductInput {
   name: String!
+  categories: [String!]
 }
 
 input UpdateProductInput {
   id: String!
   name: String!
+  categories: [String!]
 }
 
 input DeleteProductInput {

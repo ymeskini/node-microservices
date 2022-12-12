@@ -5,11 +5,13 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ApolloServerPluginLandingPageLocalDefault } from 'apollo-server-core';
 import { BullModule } from '@nestjs/bull';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 import { ProductModule } from './products/product.module';
 import { AuthModule } from './auth/auth.module';
 import configuration from '../config/configuration';
 import { ImageModule } from './images/image.module';
+import { AnalyticsModule } from './analytics/analytics.module';
 
 @Module({
   imports: [
@@ -27,6 +29,7 @@ import { ImageModule } from './images/image.module';
         password: '123',
       },
     }),
+    EventEmitterModule.forRoot(),
     AuthModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
@@ -35,6 +38,7 @@ import { ImageModule } from './images/image.module';
       playground: false,
       plugins: [ApolloServerPluginLandingPageLocalDefault()],
     }),
+    AnalyticsModule,
     ProductModule,
     ImageModule,
   ],

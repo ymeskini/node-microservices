@@ -17,6 +17,7 @@ analyticsRouter.use(jwtCheck(true));
  * @openapi
  * /api/v1/analytics:
  *   get:
+ *     summary: Retrieve analytics of a user
  *     tags:
  *       - analytics
  *     responses:

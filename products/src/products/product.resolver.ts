@@ -21,6 +21,8 @@ import { Image } from '../images/image.schema';
 import { CreateProductVariantInput } from './dto/create-product-variant.input';
 import { DeleteProductVariantInput } from './dto/delete-product-variant.input';
 import { UpdateProductVariantInput } from './dto/update-product-variant.input';
+import { GetProductsInput } from './dto/get-products.input';
+import { GetUser, User } from '../auth/user.decorator';
 
 @Resolver(() => Product)
 export class ProductResolver {
@@ -34,8 +36,9 @@ export class ProductResolver {
   @Permissions('create:products')
   createProduct(
     @Args('createProductInput') createProductInput: CreateProductInput,
+    @GetUser() user: User,
   ) {
-    return this.productsService.create(createProductInput);
+    return this.productsService.create(createProductInput, user.sub);
   }
 
   @Mutation(() => Product)
@@ -44,7 +47,7 @@ export class ProductResolver {
   updateProduct(
     @Args('updateProductInput') updateProductInput: UpdateProductInput,
   ) {
-    return this.productsService.create(updateProductInput);
+    return this.productsService.update(updateProductInput);
   }
 
   @Mutation(() => String)
@@ -63,9 +66,12 @@ export class ProductResolver {
     return this.productsService.findOneById(id);
   }
 
-  @Query(() => [Product])
-  getProducts() {
-    return this.productsService.getProducts();
+  @Query(() => [Product], { nullable: true })
+  getProducts(
+    @Args('getProductsInput', { nullable: true })
+    getProductsInput?: GetProductsInput,
+  ) {
+    return this.productsService.getProducts(getProductsInput);
   }
 
   @ResolveField('images', () => [Image])

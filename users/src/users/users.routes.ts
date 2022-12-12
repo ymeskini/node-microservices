@@ -23,6 +23,20 @@ const userController = new UserController(new UserService());
  * @openapi
  * /api/v1/users:
  *   post:
+ *     summary: Creates a user
+ *     parameters:
+ *      - in: body
+ *        name: body
+ *        required: true
+ *        schema:
+ *         type: object
+ *         properties:
+ *          email:
+ *            type: string
+ *            format: email
+ *          password:
+ *            type: string
+ *            format: password
  *     tags:
  *       - users
  *     responses:
@@ -49,6 +63,7 @@ userRouter.use(jwtCheck(true));
  * @openapi
  * /api/v1/users:
  *   get:
+ *     summary: Retrieve all users
  *     tags:
  *       - users
  *     responses:
@@ -69,6 +84,7 @@ userRouter.get(
  * @openapi
  * /api/v1/users/{:userId}:
  *   get:
+ *     summary: Retrieve one user
  *     tags:
  *       - users
  *     responses:
@@ -87,6 +103,7 @@ userRouter.get('/:id', isAdmin, catchAsync(userController.getUser));
  * @openapi
  * /api/v1/users/{:userId}:
  *   delete:
+ *     summary: Deletes a user
  *     tags:
  *       - users
  *     responses:
@@ -105,6 +122,18 @@ userRouter.delete('/:id', isAdmin, catchAsync(userController.deleteUser));
  * @openapi
  * /api/v1/users/{:userId}:
  *   put:
+ *     summary: Updates a user
+ *     parameters:
+ *       - name: Authorization
+ *         in: header
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - name: userId
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
  *     tags:
  *       - users
  *     responses:

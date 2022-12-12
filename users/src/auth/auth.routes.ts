@@ -10,6 +10,7 @@ const authController = new AuthController();
  * @openapi
  * /api/v1/auth/logout:
  *   get:
+ *     summary: Logs out the user
  *     tags:
  *       - auth
  *     responses:
@@ -21,6 +22,7 @@ authRouter.route('/logout').get(authController.logout);
  * @openapi
  * /api/v1/auth/login:
  *   get:
+ *     summary: Logs in the user (in auth0 UI) and redirects to /api/v1/auth/token
  *     tags:
  *       - auth
  *     responses:
@@ -32,6 +34,7 @@ authRouter.route('/login').get(authController.login);
  * @openapi
  * /api/v1/auth/token:
  *   get:
+ *     summary: Returns idToken and accessToken
  *     tags:
  *       - auth
  *     responses:

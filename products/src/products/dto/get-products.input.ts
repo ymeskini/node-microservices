@@ -1,12 +1,13 @@
 import { InputType, Field } from '@nestjs/graphql';
-import { MinLength } from 'class-validator';
 
 @InputType()
-export class CreateProductInput {
-  @Field()
-  @MinLength(3)
-  name: string;
-
+export class GetProductsInput {
   @Field(() => [String], { nullable: true })
   categories?: string[];
+
+  @Field({ nullable: true })
+  createdAt?: Date;
+
+  @Field({ nullable: true })
+  name?: string;
 }

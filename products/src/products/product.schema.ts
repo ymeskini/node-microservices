@@ -29,6 +29,22 @@ export class Product {
   name: string;
 
   @Prop()
+  @Field(() => Date)
+  createdAt: Date;
+
+  @Prop()
+  @Field(() => Date)
+  modifiedAt: Date;
+
+  @Prop()
+  @Field(() => [String])
+  categories: string[];
+
+  @Prop()
+  @Field(() => String)
+  userId: string;
+
+  @Prop({ ref: Image.name, type: Types.ObjectId })
   @Field(() => [Image])
   images: ImageDocument[];
 
@@ -38,3 +54,5 @@ export class Product {
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);
+
+ProductSchema.index({ name: 'text' });

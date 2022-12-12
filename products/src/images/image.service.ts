@@ -18,7 +18,10 @@ export class ImageService {
   ) {}
 
   async create(userInput: CreateImageInput) {
-    const image = await this.imageModel.create(userInput);
+    const image = await this.imageModel.create({
+      ...userInput,
+      productId: new Types.ObjectId(userInput.productId),
+    });
 
     return image;
   }
