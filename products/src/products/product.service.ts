@@ -67,10 +67,14 @@ export class ProductService {
 
   async update(userInput: UpdateProductInput) {
     const { id, ...body } = userInput;
-    const productUpdated = await this.productModel.findByIdAndUpdate(id, {
-      ...body,
-      modifiedAt: new Date(),
-    });
+    const productUpdated = await this.productModel.findByIdAndUpdate(
+      id,
+      {
+        ...body,
+        modifiedAt: new Date(),
+      },
+      { returnDocument: 'after' },
+    );
     if (!productUpdated) {
       throw new NotFoundException(`Product ${id} not found`);
     }

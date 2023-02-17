@@ -43,7 +43,9 @@ export class ImageService {
 
   async updateImage(userInput: UpdateImageInput) {
     const { imageId, ...body } = userInput;
-    const image = await this.imageModel.findByIdAndUpdate(imageId, body);
+    const image = await this.imageModel.findByIdAndUpdate(imageId, body, {
+      returnDocument: 'after',
+    });
 
     if (!image) {
       throw new NotFoundException(`Image with ${imageId} not found`);
